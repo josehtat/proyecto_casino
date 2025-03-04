@@ -1,13 +1,14 @@
-const mysql = require('mysql2');
+
+const mysql = require('mysql');
 
 
 // Configuración de la conexión a la base de datos
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'admin123',
-    password: 'Superlocal777',
+    password: 'superlocal777S',
     port: 3300,
-    database: 'restaurante'
+    database: 'mundo'
 });
 
 // Conexión a la base de datos
