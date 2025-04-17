@@ -24,6 +24,10 @@ export class Preloader extends Phaser.Scene {
         this.load.spritesheet("character5walk", "Char_005.png", { frameWidth: 48, frameHeight: 48 });
         this.load.spritesheet("character6walk", "Char_006.png", { frameWidth: 48, frameHeight: 48 });
 
+        //assets del fondo
+        this.load.image('tiles', '2D_TopDown_Tileset_Casino_1024x512.png');  // tileset
+        this.load.tilemapTiledJSON('map', 'mapa_casino.json');  // Mapa de Tiled
+
     }
 
     create() {

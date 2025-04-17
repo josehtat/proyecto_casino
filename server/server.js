@@ -16,7 +16,7 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: { origin: "*" },
+  cors: { origin: "*" },
 });
 
 
@@ -42,54 +42,56 @@ app.use(express.urlencoded({ extended: true }));
 //   });
 
 //recibir post de login
-app.post('/auth', function(request, response) {
+app.post('/auth', function (request, response) {
   // Capture the input fields
   let username = request.body.username;
   let password = request.body.password;
+  let room = request.body.room;
   // Ensure the input fields exists and are not empty
   if (username && password) {
     // Execute SQL query that'll select the account from the database based on the specified username and password
     sequelize.query('SELECT * FROM users WHERE username = :username AND password = :password', {
       replacements: { username, password }
     })
-    .then(results => {
-      // If the account exists
-      if (results[0].length > 0) {
-        // Authenticate the user
-        console.log('usuario logueado: ', results[0]);
-        request.session.loggedin = true;
-        request.session.username = username;
-        request.session.nickname = results[0][0].nickname;
-        // Redirect to home page
-        response.redirect('/');
-      } else {
-        response.send('Incorrect Username and/or Password!');
-      }
-    })
-    .catch(error => {
-      console.error('Error authenticating user:', error);
-      response.status(500).send('Internal Server Error');
-    });
+      .then(results => {
+        // If the account exists
+        if (results[0].length > 0) {
+          // Authenticate the user
+          console.log('usuario logueado: ', results[0]);
+          request.session.loggedin = true;
+          request.session.username = username;
+          request.session.nickname = results[0][0].nickname;
+          // Redirect to home page
+          if (room) {
+            response.redirect(`/?room=${room}`);
+          } else {
+            response.redirect('/');
+          }
+        } else {
+          response.send('Incorrect Username and/or Password!');
+        }
+      })
+      .catch(error => {
+        console.error('Error authenticating user:', error);
+        response.status(500).send('Internal Server Error');
+      });
   } else {
     response.send('Please enter Username and Password!');
   }
 });
 
-app.get('/', function(request, response) {
-	// If the user is loggedin
-	if (request.session.loggedin) {
-		// Output username
-		// response.send('Welcome back, ' + request.session.username + '!');
-    response.redirect('index.html');
-	} else {
-		// Not logged in
-		// response.send('Please login to view this page!');
-    response.redirect('login.html');
-	}
-	response.end();
-});
+// app.get('/', function(request, response) {
+// 	// If the user is loggedin
+// 	if (request.session.loggedin) {
+//     response.redirect('index.html');
+// 	} else {
+// 		// Not logged in
+//     response.redirect('login.html');
+// 	}
+// 	response.end();
+// });
 
-app.get('/getSession', function(request, response) {
+app.get('/getSession', function (request, response) {
   if (request.session.loggedin) {
     response.send({
       loggedin: true,
