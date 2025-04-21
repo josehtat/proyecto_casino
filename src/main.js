@@ -1,8 +1,9 @@
 import { Preloader } from './Preloader';
 import { Play } from './Play';
-import { Title } from './scenes/Title'
-import { Rooms } from './scenes/Rooms'
-import { MainGame } from './scenes/MainGame'
+import { Title } from './scenes/Title';
+import { Rooms } from './scenes/Rooms';
+import { MainGame } from './scenes/MainGame';
+import { Chat } from './scenes/Chat';
 import Phaser from 'phaser';
 
 const config = {
@@ -32,7 +33,8 @@ const config = {
         Play,
         Title,
         Rooms,
-        MainGame
+        MainGame,
+        Chat
     ]
 };
 

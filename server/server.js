@@ -43,40 +43,38 @@ app.use(express.urlencoded({ extended: true }));
 
 //recibir post de login
 app.post('/auth', function (request, response) {
-  // Capture the input fields
+  // Si no es AJAX, denegar el acceso
+  if (request.headers['x-requested-with'] !== 'XMLHttpRequest') {
+    return response.status(403).send('Access denied');
+  }
   let username = request.body.username;
   let password = request.body.password;
   let room = request.body.room;
-  // Ensure the input fields exists and are not empty
+
   if (username && password) {
-    // Execute SQL query that'll select the account from the database based on the specified username and password
     sequelize.query('SELECT * FROM users WHERE username = :username AND password = :password', {
       replacements: { username, password }
     })
       .then(results => {
-        // If the account exists
         if (results[0].length > 0) {
-          // Authenticate the user
           console.log('usuario logueado: ', results[0]);
           request.session.loggedin = true;
           request.session.username = username;
           request.session.nickname = results[0][0].nickname;
-          // Redirect to home page
-          if (room) {
-            response.redirect(`/?room=${room}`);
-          } else {
-            response.redirect('/');
-          }
+
+          // Enviar respuesta JSON indicando éxito
+          response.json({ success: true, room });
         } else {
-          response.send('Incorrect Username and/or Password!');
+          // Enviar respuesta JSON indicando error
+          response.status(401).json({ success: false, message: 'Usuario o contraseña incorrectos' });
         }
       })
       .catch(error => {
         console.error('Error authenticating user:', error);
-        response.status(500).send('Internal Server Error');
+        response.status(500).json({ success: false, message: 'Internal Server Error' });
       });
   } else {
-    response.send('Please enter Username and Password!');
+    response.status(400).json({ success: false, message: 'Por favor, complete ambos campos' });
   }
 });
 

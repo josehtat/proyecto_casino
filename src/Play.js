@@ -18,11 +18,7 @@ export class Play extends Phaser.Scene {
   create() {
     const scene = this;
 
-    //creación del socket
-    this.game.socket = io();
     this.game.session = {}; // Inicializar la sesión
-
-
 
     //recibir sesión
     this.fetchSession();
@@ -34,6 +30,8 @@ export class Play extends Phaser.Scene {
   }
 
   fetchSession() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomCode = urlParams.get("room"); // Obtener el código de la sala de los parámetros de la URL
     fetch('/getSession')
       .then(response => {
         if (response.ok) {
@@ -45,10 +43,19 @@ export class Play extends Phaser.Scene {
         }
       })
       .then(data => {
+        if (!data.loggedin) { // en el juego solo permitimos usuarios logueados, si no lo están, al login
+          if(roomCode){
+            window.location.href = `/?room=${roomCode}`;
+          }
+          else{
+            window.location.href = '/';
+          }
+        }
+            //creación del socket
+        this.game.socket = io();
         this.game.session = data; // Almacenamiento de la sesión del jugador
         console.log('Sesión del jugador:', this.game.session);
-        const urlParams = new URLSearchParams(window.location.search);
-        const roomCode = urlParams.get("room");    
+   
         if (roomCode) {
           this.game.socket.emit("joinRoom", roomCode, this.game.session.nickname);
           this.game.socket.on("roomJoined", () => {
@@ -65,9 +72,6 @@ export class Play extends Phaser.Scene {
           this.scene.start("Title");
         }
     
-        if (!data.loggedin) { // en el juego solo permitimos usuarios logueados, si no lo están, al login
-          window.location.href = '/';
-        }
       })
       .catch(error => console.error('Error al obtener la sesión:', error));
   }
