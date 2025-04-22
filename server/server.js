@@ -78,6 +78,35 @@ app.post('/auth', function (request, response) {
   }
 });
 
+app.post('/register', async (request, response) => {
+  const { username, password } = request.body;
+
+  if (username && password) {
+    try {
+      // Verificar si el usuario ya existe
+      const [existingUser] = await sequelize.query('SELECT * FROM users WHERE username = :username', {
+        replacements: { username },
+      });
+
+      if (existingUser.length > 0) {
+        return response.status(400).send('El usuario ya existe.');
+      }
+
+      // Insertar el nuevo usuario en la base de datos
+      await sequelize.query('INSERT INTO users (username, password) VALUES (:username, :password)', {
+        replacements: { username, password },
+      });
+
+      response.send('Usuario registrado exitosamente.');
+    } catch (error) {
+      console.error('Error registrando usuario:', error);
+      response.status(500).send('Error interno del servidor.');
+    }
+  } else {
+    response.status(400).send('Por favor, completa todos los campos.');
+  }
+});
+
 // app.get('/', function(request, response) {
 // 	// If the user is loggedin
 // 	if (request.session.loggedin) {
