@@ -1,0 +1,5 @@
+DB_NAME=*nombre de la base de datos*
+DB_USER=*usuario de la base de datos*
+DB_PASS=*password del usuaruio*
+DB_HOST=*host que aloja la base de datos, usualmente localhost*
+SECRET_SESSION=*clave que express-session usará para cifrar la cookie de sesión*
