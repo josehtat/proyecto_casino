@@ -54,7 +54,7 @@ export class Play extends Phaser.Scene {
             //creación del socket
         this.game.socket = io();
         this.game.session = data; // Almacenamiento de la sesión del jugador
-        console.log('Sesión del jugador:', this.game.session);
+        // console.log('Sesión del jugador:', this.game.session);
    
         if (roomCode) {
           this.game.socket.emit("joinRoom", roomCode, this.game.session.nickname);

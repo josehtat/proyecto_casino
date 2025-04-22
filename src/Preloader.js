@@ -28,6 +28,19 @@ export class Preloader extends Phaser.Scene {
         this.load.image('tiles', '2D_TopDown_Tileset_Casino_1024x512.png');  // tileset
         this.load.tilemapTiledJSON('map', 'mapa_casino.json');  // Mapa de Tiled
 
+        //assets de cartas, están en assets/cards
+        //las cartas tienen nombres como "2-C.png", "A-C.png" para los ases, "J-C.png" para las J, "Q-C.png" para las Q y "K-C.png" para las K
+        //los palos de las cartas son C (Clubs), D (Diamonds), H (hearts) y P (spades)
+        const suits = ['C', 'D', 'H', 'P'];
+        const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+
+        suits.forEach(suit => {
+            ranks.forEach(rank => {
+            this.load.image(`${rank}-${suit}`, `cards/${rank}-${suit}.png`);
+            });
+        });
+        this.load.image('back', 'cards/BACK.png'); // Cargar la parte trasera de la carta
+
     }
 
     create() {

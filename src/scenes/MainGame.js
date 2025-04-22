@@ -49,6 +49,21 @@ export class MainGame extends Phaser.Scene {
     this.pillars = this.map.createLayer('pilar_oscuro', this.tileset);
     this.slotsDeco = this.map.createLayer('soporte_tragaperras_pegadoPared', this.tileset);
 
+    //recoger los objetos de la capa de objetos de juegos
+    const gameZonesLayer = this.map.getObjectLayer('zonas_juego');
+    this.gameZones = this.physics.add.group();
+
+    gameZonesLayer.objects.forEach((obj) => {
+      const zone = this.add.zone(obj.x, obj.y, obj.width, obj.height)
+        .setOrigin(0)
+        .setName(obj.name || obj.type) // puedes usar "blackjack" como tipo
+        .setData('game', obj.type); // guardar el tipo de juego
+      this.physics.world.enable(zone);
+      this.gameZones.add(zone);
+    });
+  
+    
+
     //colisión del suelo (esto hay que arreglarlo, está al contrario de lo deseado)
     this.ceiling.setCollisionByExclusion([-1], true);
 
@@ -145,7 +160,44 @@ export class MainGame extends Phaser.Scene {
       console.log('Colisión detectada!');
     });
     const debugGraphics = this.add.graphics().setAlpha(0.75);
-    this.floor.renderDebug(debugGraphics);
+    this.ceiling.renderDebug(debugGraphics);
+    // dibujar las caja de colisión del jugador
+    // Dibujar la caja de colisión del jugador
+    const playerDebugGraphics = this.add.graphics().setAlpha(0.75);
+    this.player.body.debugShowBody = true;
+    this.player.body.debugShowVelocity = true;
+    this.physics.world.drawDebug = true;
+    this.physics.world.createDebugGraphic();
+    // Reducir el tamaño de la caja de colisión del jugador
+    this.player.body.setSize(this.player.width * 0.5, this.player.height * 0.5);
+    this.player.body.setOffset(this.player.width * 0.25, this.player.height * 0.5);
+
+    // colisiones entre el jugador y las zonas de juego
+    // Solapamiento entre jugador y zona de juego
+    this.physics.add.overlap(this.player, this.gameZones, (player, zone) => {
+      this.playerNearGame = zone;
+    });
+  
+    // Reset si no hay solapamiento
+    this.physics.world.on('worldstep', () => {
+      if (!this.physics.overlap(this.player, this.gameZones)) {
+        this.playerNearGame = null;
+      }
+    });
+  
+    // Tecla E para interactuar
+    this.input.keyboard.on('keydown-E', () => {
+      if (this.playerNearGame) {
+        const minigame = this.playerNearGame.getData('game');
+        if (minigame === 'Blackjack') {
+          this.scene.launch('Blackjack');
+          // opcional: this.scene.pause();
+        }
+      }
+    });
+  
+    // --- DEBUG ---
+    this.drawDebugZones(this.gameZones);
 
 
     // --- Multijugador ---
@@ -358,6 +410,23 @@ export class MainGame extends Phaser.Scene {
         player.chatBubble.destroy();
         player.chatBubble = null;
       }
+    });
+  }
+
+
+  drawDebugZones(group) {
+    const graphics = this.add.graphics().setDepth(2000); // arriba del todo
+    graphics.lineStyle(2, 0x00ff00, 1);
+  
+    group.getChildren().forEach(zone => {
+      graphics.strokeRect(zone.x, zone.y, zone.width, zone.height);
+      const text = this.add.text(zone.x + zone.width / 2, zone.y + zone.height / 2, zone.name, {
+        fontSize: '12px',
+        fill: '#fff',
+        backgroundColor: '#00000099',
+        padding: { x: 4, y: 2 }
+      }).setOrigin(0.5);
+      text.setDepth(2001); // Asegurarse de que el texto esté por encima del gráfico
     });
   }
 
