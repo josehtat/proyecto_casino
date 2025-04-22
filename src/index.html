@@ -4,18 +4,17 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width,minimum-scale=1">
 		<title>Login</title>
-        <!-- the form awesome library is used to add icons to our form -->
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
-        <!-- include the stylesheet file -->
         <link href="login.css" rel="stylesheet" type="text/css">
-        <script src="js/index.js"></script>
+        <script src="js/index.js" defer></script>
+		<script src="loginRegister.js"></script>
 	</head>
 	<body>
 		<div class="login">
-			<h1>Login</h1>
+			<h1 id="formTitle">Login</h1>
+			
 			<form id="loginForm">
 				<label for="username">
-					<!-- font awesome icon -->
 					<i class="fas fa-user"></i>
 				</label>
 				<input type="text" name="username" placeholder="Username" id="username" required>
@@ -25,7 +24,25 @@
 				<input type="password" name="password" placeholder="Password" id="password" required>
 				<input type="submit" value="Login">
 			</form>
+			
+			<form id="registerForm" style="display: none;">
+				<label for="regUsername">
+					<i class="fas fa-user"></i>
+				</label>
+				<input type="text" name="username" placeholder="Username" id="regUsername" required>
+				<label for="regPassword">
+					<i class="fas fa-lock"></i>
+				</label>
+				<input type="password" name="password" placeholder="Password" id="regPassword1" required>
+				<input type="password" name="confirmPassword" placeholder="Confirm Password" id="regPassword2" required>
+				<input type="submit" value="Registrar">
+			</form>
+			
 			<p id="errorMessage" style="color: red; display: none;"></p>
+			
+			<p id="toggleForm">
+				¿No tienes cuenta? <a href="#" id="showRegister">Regístrate</a>
+			</p>
 		</div>
 	</body>
 </html>
