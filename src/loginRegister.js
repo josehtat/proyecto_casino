@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     showRegister.addEventListener('click', (event) => {
         event.preventDefault();
         if (registerForm.style.display === 'none') {
-            // Mostrar formulario de registro
             loginForm.style.display = 'none';
             registerForm.style.display = 'block';
             formTitle.textContent = 'Registro';
@@ -18,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loginForm.style.display = 'block';
             registerForm.style.display = 'none';
             formTitle.textContent = 'Login';
-            showRegister.textContent = '¿No tienes cuenta? Regístrate';
+            showRegister.textContent = 'Regístrate';
         }
         errorMessage.style.display = 'none';
     });
