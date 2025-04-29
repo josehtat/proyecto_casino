@@ -5,6 +5,7 @@ import { Rooms } from './scenes/Rooms';
 import { MainGame } from './scenes/MainGame';
 import { Chat } from './scenes/Chat';
 import { Blackjack } from './scenes/Blackjack';
+import { Slot } from './scenes/Slot';
 import Phaser from 'phaser';
 
 const config = {
@@ -36,7 +37,8 @@ const config = {
         Rooms,
         MainGame,
         Chat,
-        Blackjack
+        Blackjack,
+        Slot
     ]
 };
 
