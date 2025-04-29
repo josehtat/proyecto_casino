@@ -182,6 +182,26 @@ export class Chat extends Phaser.Scene {
             }
         });
 
+        // Recibir los mensajes previos a la conexión del jugador
+        this.socket.emit('getChatMessages', this.roomCode);
+        this.socket.on('chatMessagesList', (messages) => {
+            messages.forEach(({ id, nickname, text }) => {
+                const message = `<div><strong>${nickname}</strong>: ${text}</div>`;
+                this.chatMessages.push(message);
+            });
+
+            // Limitar a 100 mensajes
+            if (this.chatMessages.length > 100) {
+                this.chatMessages.splice(0, this.chatMessages.length - 100);
+            }
+
+            const chatDiv = this.chatMessagesContainer.node.firstElementChild;
+            chatDiv.innerHTML = this.chatMessages.join('');
+            chatDiv.scrollTop = chatDiv.scrollHeight; // autoscroll al final
+        }
+        );
+
+        // Recibir mensajes de otros jugadores
         this.socket.on('chatMessageToRoom', ({ id, nickname, text }) => {
             console.log(`${nickname}: ${text}`);
             // Mostrar mensaje en el chat

@@ -36,18 +36,26 @@ export class MainGame extends Phaser.Scene {
     // Cargar tileset
     this.tileset = this.map.addTilesetImage('2D_TopDown_Tileset_Casino_2', 'tiles');
 
+
+
     // Crear capas del mapa utilizando ambos tilesets
     this.floor = this.map.createLayer('Suelo', this.tileset);
-    this.ceiling = this.map.createLayer('Parte_Superior', this.tileset);
-    this.decorations = this.map.createLayer('objetos', this.tileset);
     this.chairs = this.map.createLayer('mesas_sillas', this.tileset);
     this.gameboards = this.map.createLayer('juegos', this.tileset);
     this.chairs2 = this.map.createLayer('sillas_porencima', this.tileset);
+ 
+    // creación del jugador
+    this.player = this.physics.add.sprite(400, 400, 'character1idle')
+    this.ceiling = this.map.createLayer('Parte_Superior', this.tileset);
+    this.decorations = this.map.createLayer('objetos', this.tileset);
     this.slots1 = this.map.createLayer('tragaperras1', this.tileset);
     this.slots2 = this.map.createLayer('tragaperras2', this.tileset);
     this.slots3 = this.map.createLayer('tragaperras3', this.tileset);
     this.pillars = this.map.createLayer('pilar_oscuro', this.tileset);
     this.slotsDeco = this.map.createLayer('soporte_tragaperras_pegadoPared', this.tileset);
+    this.colisions = this.map.getObjectLayer('colisiones');
+
+ ;
 
     //recoger los objetos de la capa de objetos de juegos
     const gameZonesLayer = this.map.getObjectLayer('zonas_juego');
@@ -61,14 +69,26 @@ export class MainGame extends Phaser.Scene {
       this.physics.world.enable(zone);
       this.gameZones.add(zone);
     });
-  
-    
 
-    //colisión del suelo (esto hay que arreglarlo, está al contrario de lo deseado)
+
+
+    //colisión de los límites
     this.ceiling.setCollisionByExclusion([-1], true);
 
-    //creación del jugador
-    this.player = this.physics.add.sprite(400, 400, 'character1idle');
+    //colisión con la capa de objetos "colisiones"
+    this.colisions.objects.forEach((obj) => {
+      const rect = new Phaser.Geom.Rectangle(obj.x, obj.y, obj.width, obj.height);
+      const zone = this.add.zone(rect.x, rect.y, rect.width, rect.height)
+        .setOrigin(0)
+        .setName(obj.name || obj.type);
+      this.physics.world.enable(zone);
+      zone.body.setImmovable(true); // Hacer que el objeto sea inmóvil
+      this.physics.add.collider(this.player, zone, () => {
+        console.log('Colisión detectada con zona:', zone.name);
+      });
+    });
+
+
 
     //nombre del jugador
     this.nameText = this.add.text(0, 0, this.session.nickname, {
@@ -177,25 +197,30 @@ export class MainGame extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.gameZones, (player, zone) => {
       this.playerNearGame = zone;
     });
-  
+
     // Reset si no hay solapamiento
     this.physics.world.on('worldstep', () => {
       if (!this.physics.overlap(this.player, this.gameZones)) {
         this.playerNearGame = null;
       }
     });
-  
+
     // Tecla E para interactuar
     this.input.keyboard.on('keydown-E', () => {
       if (this.playerNearGame) {
-        const minigame = this.playerNearGame.getData('game');
-        if (minigame === 'Blackjack') {
-          this.scene.launch('Blackjack');
+      // --- AGREGAR MINIJUEGOS AQUI ---
+        if (this.playerNearGame.name === 'Blackjack1') {
+          //decirle a la escena del blackjack que es la mesa 1
+          if (this.isTyping || this.movementBlocked) {
+            return; // No permitir la interacción si el jugador está escribiendo o el movimiento está bloqueado
+          }
+          this.scene.launch('Blackjack', { roomCode: this.roomCode, table: this.playerNearGame.name });
+
           // opcional: this.scene.pause();
         }
       }
     });
-  
+
     // --- DEBUG ---
     this.drawDebugZones(this.gameZones);
 
@@ -269,6 +294,11 @@ export class MainGame extends Phaser.Scene {
       }
     });
 
+    // Escuchar el evento de bloqueo de movimiento de la escena del blackjack
+    const blackjackScene = this.scene.get('Blackjack');
+    blackjackScene.events.on('blockPlayerMovement', (block) => {
+      this.movementBlocked = block;
+    });
 
   }
 
@@ -306,10 +336,10 @@ export class MainGame extends Phaser.Scene {
       moving = true;
     }
     // bloquear movimiento mientras se escribe en el chat
-    if (this.isTyping) {
+    if (this.isTyping || this.movementBlocked) {
       this.player.setVelocity(0);
+      this.player.direction = 'down'; // Resetear dirección al bloquear movimiento
       moving = false;
-      return;
     }
 
     // animaciones del jugador
@@ -417,7 +447,7 @@ export class MainGame extends Phaser.Scene {
   drawDebugZones(group) {
     const graphics = this.add.graphics().setDepth(2000); // arriba del todo
     graphics.lineStyle(2, 0x00ff00, 1);
-  
+
     group.getChildren().forEach(zone => {
       graphics.strokeRect(zone.x, zone.y, zone.width, zone.height);
       const text = this.add.text(zone.x + zone.width / 2, zone.y + zone.height / 2, zone.name, {
