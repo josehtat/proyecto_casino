@@ -40,11 +40,14 @@ export class MainGame extends Phaser.Scene {
 
     // Crear capas del mapa utilizando ambos tilesets
     this.floor = this.map.createLayer('Suelo', this.tileset);
-    this.ceiling = this.map.createLayer('Parte_Superior', this.tileset);
-    this.decorations = this.map.createLayer('objetos', this.tileset);
     this.chairs = this.map.createLayer('mesas_sillas', this.tileset);
     this.gameboards = this.map.createLayer('juegos', this.tileset);
     this.chairs2 = this.map.createLayer('sillas_porencima', this.tileset);
+ 
+    // creación del jugador
+    this.player = this.physics.add.sprite(400, 400, 'character1idle')
+    this.ceiling = this.map.createLayer('Parte_Superior', this.tileset);
+    this.decorations = this.map.createLayer('objetos', this.tileset);
     this.slots1 = this.map.createLayer('tragaperras1', this.tileset);
     this.slots2 = this.map.createLayer('tragaperras2', this.tileset);
     this.slots3 = this.map.createLayer('tragaperras3', this.tileset);
@@ -52,8 +55,7 @@ export class MainGame extends Phaser.Scene {
     this.slotsDeco = this.map.createLayer('soporte_tragaperras_pegadoPared', this.tileset);
     this.colisions = this.map.getObjectLayer('colisiones');
 
-    //creación del jugador
-    this.player = this.physics.add.sprite(400, 400, 'character1idle');
+ ;
 
     //recoger los objetos de la capa de objetos de juegos
     const gameZonesLayer = this.map.getObjectLayer('zonas_juego');
@@ -206,8 +208,14 @@ export class MainGame extends Phaser.Scene {
     // Tecla E para interactuar
     this.input.keyboard.on('keydown-E', () => {
       if (this.playerNearGame) {
-        if ( this.playerNearGame.name === 'Blackjack1') {
-          this.scene.launch('Blackjack');
+      // --- AGREGAR MINIJUEGOS AQUI ---
+        if (this.playerNearGame.name === 'Blackjack1') {
+          //decirle a la escena del blackjack que es la mesa 1
+          if (this.isTyping || this.movementBlocked) {
+            return; // No permitir la interacción si el jugador está escribiendo o el movimiento está bloqueado
+          }
+          this.scene.launch('Blackjack', { roomCode: this.roomCode, table: this.playerNearGame.name });
+
           // opcional: this.scene.pause();
         }
       }
@@ -286,6 +294,11 @@ export class MainGame extends Phaser.Scene {
       }
     });
 
+    // Escuchar el evento de bloqueo de movimiento de la escena del blackjack
+    const blackjackScene = this.scene.get('Blackjack');
+    blackjackScene.events.on('blockPlayerMovement', (block) => {
+      this.movementBlocked = block;
+    });
 
   }
 
@@ -323,10 +336,10 @@ export class MainGame extends Phaser.Scene {
       moving = true;
     }
     // bloquear movimiento mientras se escribe en el chat
-    if (this.isTyping) {
+    if (this.isTyping || this.movementBlocked) {
       this.player.setVelocity(0);
+      this.player.direction = 'down'; // Resetear dirección al bloquear movimiento
       moving = false;
-      return;
     }
 
     // animaciones del jugador
