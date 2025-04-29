@@ -80,6 +80,8 @@ app.post('/auth', function (request, response) {
 
 app.post('/register', async (request, response) => {
   const { username, password } = request.body;
+  const nickname = request.body.nickname || username;
+  const score = request.body.score || 100;
 
   if (username && password) {
     try {
@@ -93,8 +95,8 @@ app.post('/register', async (request, response) => {
       }
 
       // Insertar el nuevo usuario en la base de datos
-      await sequelize.query('INSERT INTO users (username, password) VALUES (:username, :password)', {
-        replacements: { username, password },
+      await sequelize.query('INSERT INTO users (username, password, nickname, score) VALUES (:username, :password, :nickname, :score)', {
+        replacements: { username, password, nickname, score },
       });
 
       response.send('Usuario registrado exitosamente.');

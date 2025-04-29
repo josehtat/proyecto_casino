@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loginForm.style.display = 'block';
             registerForm.style.display = 'none';
             formTitle.textContent = 'Login';
-            showRegister.textContent = 'Regístrate';
+            showRegister.textContent = '¿No tienes cuenta? Regístrate';
         }
         errorMessage.style.display = 'none';
     });
@@ -53,7 +53,19 @@ document.addEventListener('DOMContentLoaded', () => {
     registerForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const username = document.getElementById('regUsername').value;
-        const password = document.getElementById('regPassword').value;
+        const password1 = document.getElementById('regPassword1').value;
+        const password2 = document.getElementById('regPassword2').value;
+
+        if (password1 !== password2) {
+            errorMessage.textContent = 'Las contraseñas no coinciden';
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 3000); // Ocultar después de 3 segundos
+            return;
+        }
+
+        const password = password1;
 
         try {
             const response = await fetch('/register', {
@@ -74,6 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const errorText = await response.text();
                 errorMessage.textContent = errorText || 'Error al registrar usuario';
                 errorMessage.style.display = 'block';
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 3000);
             }
         } catch (error) {
             console.error('Error al registrar usuario:', error);
