@@ -67,28 +67,42 @@ export class Slot extends Phaser.Scene {
     }
 
     spinReels(symbols) {
-        // Girar las columnas y detenerlas con un resultado aleatorio
+        // Animar las columnas para que giren
         this.columns.forEach((column, index) => {
-            this.time.delayedCall(index * 200, () => {
-                const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-                column.setText(randomSymbol);
+            let spinCount = 10 + index * 5; // Número de giros por columna (más giros para las últimas)
+            this.time.addEvent({
+                delay: 50, // Tiempo entre cada cambio de símbolo
+                repeat: spinCount - 1, // Número de repeticiones
+                callback: () => {
+                    const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                    column.setText(randomSymbol);
+                },
+                onComplete: () => {
+                    // Detener la columna con un símbolo final
+                    const finalSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                    column.setText(finalSymbol);
+
+                    // Verificar el resultado después de que todas las columnas se detengan
+                    if (index === this.columns.length - 1) {
+                        this.checkResult();
+                    }
+                }
             });
         });
+    }
 
-        // Verificar el resultado después de que todas las columnas se detengan
-        this.time.delayedCall(600, () => {
-            const result = this.columns.map(column => column.text);
-            console.log('Resultado del slot:', result);
+    checkResult() {
+        const result = this.columns.map(column => column.text);
+        console.log('Resultado del slot:', result);
 
-            // Comprobar si todos los símbolos son iguales (victoria)
-            const isWin = result.every(symbol => symbol === result[0]);
+        // Comprobar si todos los símbolos son iguales (victoria)
+        const isWin = result.every(symbol => symbol === result[0]);
 
-            if (isWin) {
-                this.showWinMessage();
-            } else {
-                console.log('No has ganado. Intenta de nuevo.');
-            }
-        });
+        if (isWin) {
+            this.showWinMessage();
+        } else {
+            console.log('No has ganado. Intenta de nuevo.');
+        }
     }
 
     showWinMessage() {
