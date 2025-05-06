@@ -309,6 +309,11 @@ export class MainGame extends Phaser.Scene {
       this.movementBlocked = block;
     });
 
+    const SlotScene = this.scene.get('Slot');
+    SlotScene.events.on('blockPlayerMovement', (block) => {
+      this.movementBlocked = block;
+    });
+
   }
 
   update(time, delta) {

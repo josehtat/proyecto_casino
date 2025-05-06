@@ -14,6 +14,7 @@ export class Slot extends Phaser.Scene {
 
     create() {
         console.log('Escena de Slot creada');
+        this.events.emit('blockPlayerMovement', true);
 
         // Crear el fondo de la máquina
         this.add.rectangle(400, 300, 400, 500, 0x000000, 0.8); // Fondo centrado y ajustado
