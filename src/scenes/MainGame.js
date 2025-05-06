@@ -179,15 +179,15 @@ export class MainGame extends Phaser.Scene {
     this.physics.add.collider(this.player, this.ceiling, (player, ceiling) => {
       console.log('Colisión detectada!');
     });
-    const debugGraphics = this.add.graphics().setAlpha(0.75);
-    this.ceiling.renderDebug(debugGraphics);
-    // dibujar las caja de colisión del jugador
-    // Dibujar la caja de colisión del jugador
-    const playerDebugGraphics = this.add.graphics().setAlpha(0.75);
-    this.player.body.debugShowBody = true;
-    this.player.body.debugShowVelocity = true;
-    this.physics.world.drawDebug = true;
-    this.physics.world.createDebugGraphic();
+    // const debugGraphics = this.add.graphics().setAlpha(0.75);
+    // this.ceiling.renderDebug(debugGraphics);
+    // // dibujar las caja de colisión del jugador
+    // // Dibujar la caja de colisión del jugador
+    // const playerDebugGraphics = this.add.graphics().setAlpha(0.75);
+    // this.player.body.debugShowBody = true;
+    // this.player.body.debugShowVelocity = true;
+    // this.physics.world.drawDebug = true;
+    // this.physics.world.createDebugGraphic();
     // Reducir el tamaño de la caja de colisión del jugador
     this.player.body.setSize(this.player.width * 0.5, this.player.height * 0.5);
     this.player.body.setOffset(this.player.width * 0.25, this.player.height * 0.5);
@@ -211,6 +211,15 @@ export class MainGame extends Phaser.Scene {
       // --- AGREGAR MINIJUEGOS AQUI ---
         if (this.playerNearGame.name === 'Blackjack1') {
           //decirle a la escena del blackjack que es la mesa 1
+          if (this.isTyping || this.movementBlocked) {
+            return; // No permitir la interacción si el jugador está escribiendo o el movimiento está bloqueado
+          }
+          this.scene.launch('Blackjack', { roomCode: this.roomCode, table: this.playerNearGame.name });
+
+          // opcional: this.scene.pause();
+        }
+        if (this.playerNearGame.name === 'Blackjack2') {
+          //decirle a la escena del blackjack que es la mesa 2
           if (this.isTyping || this.movementBlocked) {
             return; // No permitir la interacción si el jugador está escribiendo o el movimiento está bloqueado
           }
