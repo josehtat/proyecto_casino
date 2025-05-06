@@ -218,6 +218,15 @@ export class MainGame extends Phaser.Scene {
 
           // opcional: this.scene.pause();
         }
+        if (this.playerNearGame.name === 'slot') {
+          //decirle a la escena del blackjack que es la mesa 1
+          if (this.isTyping || this.movementBlocked) {
+            return; // No permitir la interacción si el jugador está escribiendo o el movimiento está bloqueado
+          }
+          this.scene.launch('Slot', { roomCode: this.roomCode, table: this.playerNearGame.name });
+
+          // opcional: this.scene.pause();
+        }
       }
     });
 
