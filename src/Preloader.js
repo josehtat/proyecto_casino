@@ -25,8 +25,18 @@ export class Preloader extends Phaser.Scene {
         this.load.spritesheet("character6walk", "Char_006.png", { frameWidth: 48, frameHeight: 48 });
 
         //assets del fondo
+        this.load.image("checkerboard", "checkerboard.png"); // Cargar la textura de cuadros
         this.load.image('tiles', '2D_TopDown_Tileset_Casino_1024x512.png');  // tileset
         this.load.tilemapTiledJSON('map', 'mapa_casino.json');  // Mapa de Tiled
+
+        //assets de las teclas
+        this.load.image('keyW', 'keys/W.png');
+        this.load.image('keyA', 'keys/A.png');
+        this.load.image('keyS', 'keys/S.png');
+        this.load.image('keyD', 'keys/D.png');
+        this.load.image('keyE', 'keys/E.png');
+        this.load.image('keyT', 'keys/T.png');
+        this.load.image('keyEsc', 'keys/ESC.png');
 
         //assets de cartas, están en assets/cards
         //las cartas tienen nombres como "2-C.png", "A-C.png" para los ases, "J-C.png" para las J, "Q-C.png" para las Q y "K-C.png" para las K

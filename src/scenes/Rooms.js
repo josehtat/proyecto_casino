@@ -10,6 +10,8 @@ export class Rooms extends Phaser.Scene {
     }
 
     create() {
+               // Agregar el fondo animado
+               this.background = this.add.tileSprite(400, 225, 800, 450, "checkerboard").setScale(4);
         this.add.text(400, 50, "Salas Disponibles", { fontSize: "24px", color: "#fff" }).setOrigin(0.5);
 
         // Obtener el socket - SUPER IMPORTANTE!! necesario para no crear un nuevo socket
@@ -32,7 +34,14 @@ export class Rooms extends Phaser.Scene {
             .on("pointerdown", () => {
                 this.socket.emit("createRoom", this.session.nickname, false);
             });
-
+        this.createRoomBtn.on("pointerover", () => {
+            this.createRoomBtn.setStyle({ color: "#0f0" });
+        }
+        );
+        this.createRoomBtn.on("pointerout", () => {
+            this.createRoomBtn.setStyle({ color: "#ff0" });
+        }
+        );
         // Botón: Crear sala privada
         this.createPrivateRoomBtn = this.add.text(400, 420, "Crear Sala Privada", { fontSize: "20px", color: "#ff0" })
             .setOrigin(0.5)
@@ -40,7 +49,14 @@ export class Rooms extends Phaser.Scene {
             .on("pointerdown", () => {
                 this.socket.emit("createRoom", this.session.nickname, true);
             });
-
+        this.createPrivateRoomBtn.on("pointerover", () => {
+            this.createPrivateRoomBtn.setStyle({ color: "#0f0" });
+        }
+        );
+        this.createPrivateRoomBtn.on("pointerout", () => {
+            this.createPrivateRoomBtn.setStyle({ color: "#ff0" });
+        }
+        );
         // Botones de paginación
         this.prevBtn = this.add.text(140, 300, "< Anterior", { fontSize: "18px", color: "#0ff" })
             .setInteractive()
@@ -50,6 +66,18 @@ export class Rooms extends Phaser.Scene {
                     this.renderRoomList();
                 }
             });
+        this.prevBtn.on("pointerover", () => {
+            if (this.currentPage > 0) {
+                this.prevBtn.setStyle({ color: "#0f0" });
+            }
+        }
+        );
+        this.prevBtn.on("pointerout", () => {
+            if (this.currentPage > 0) {
+                this.prevBtn.setStyle({ color: "#0ff" });
+            }
+        }
+        );
 
         this.nextBtn = this.add.text(550, 300, "Siguiente >", { fontSize: "18px", color: "#0ff" })
             .setInteractive()
@@ -59,6 +87,19 @@ export class Rooms extends Phaser.Scene {
                     this.renderRoomList();
                 }
             });
+
+        this.nextBtn.on("pointerover", () => {
+            if ((this.currentPage + 1) * this.roomsPerPage < this.rooms.length) {
+                this.nextBtn.setStyle({ color: "#0f0" });
+            }
+        }
+        );
+        this.nextBtn.on("pointerout", () => {
+            if ((this.currentPage + 1) * this.roomsPerPage < this.rooms.length) {
+                this.nextBtn.setStyle({ color: "#0ff" });
+            }
+        }
+        );
 
         this.pageIndicator = this.add.text(400, 310, "", {
             fontSize: "18px",
@@ -72,6 +113,12 @@ export class Rooms extends Phaser.Scene {
             this.socket.off("roomError", this.handleRoomError);
         });
 
+    }
+
+    update() {
+        // Desplazar el fondo en diagonal
+        this.background.tilePositionX -= 0.12; // Mover en el eje X
+        this.background.tilePositionY -= 0.12; // Mover en el eje Y
     }
 
     handleRoomListUpdated = (rooms) => {
@@ -111,6 +158,12 @@ export class Rooms extends Phaser.Scene {
                 console.log(`Unirse a la sala ${room.code} como ${this.session.nickname}`);
                 this.socket.emit("joinRoom", room.code, this.session.nickname);
             });
+            roomText.on("pointerover", () => {
+                roomText.setStyle({ color: "#ff0" });
+            });
+            roomText.on("pointerout", () => {
+                roomText.setStyle({ color: "#0f0" });
+            });
 
             this.roomTexts.push(roomText);
             y += 40;
@@ -128,6 +181,10 @@ export class Rooms extends Phaser.Scene {
 
         this.nextBtn.setAlpha((this.currentPage + 1 === totalPages) ? 0.5 : 1).disableInteractive();
         if (this.currentPage + 1 < totalPages) this.nextBtn.setInteractive();
+        
+
+        this.nextBtn.setStyle({ color: "#0ff" });
+        this.prevBtn.setStyle({ color: "#0ff" });
 
     }
 }

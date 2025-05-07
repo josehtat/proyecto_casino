@@ -14,54 +14,7 @@ export class Chat extends Phaser.Scene {
     create() {
         // creación del chat
         this.chatVisible = true;
-        // this.isTyping = false;
-
-        // Chat box UI
-
-        // this.chatBox = this.add.rectangle(0, 300, 380, 120, 0x000000, 0.5).setOrigin(0).setScrollFactor(0);
-        // this.chatInput = this.add.dom(0, 420).createFromHTML('<input type="text" placeholder="Pulsa T para chatear" maxlength="100">').setScrollFactor(0);
-        // this.chatInput.node.parentNode.style.position = 'absolute';
-        // this.chatInput.node.parentNode.style.zIndex = '1000'; // el contenedor del input ha de estar por encima de otros elementos
-        // this.chatInput.node.firstChild.style.width = '374px';
-        // this.chatInput.node.firstChild.style.height = '20px';
-        // this.chatInput.node.firstChild.style.background = 'white';
-        // this.chatInput.node.firstChild.style.border = '1px solid black';
-        // this.chatInput.node.firstChild.style.opacity = '1';
-        // this.chatInput.node.firstChild.style.zIndex = '1000'; 
-
-        // this.chatInput.setOrigin(0);
-        // this.chatInput.setVisible(true);
-
-        // // Activar chat con la tecla T
-        // this.input.keyboard.on('keydown-T', () => {
-        //     console.log('Tecla T presionada');
-        //     this.chatVisible = true;
-        //     // pasar el foco al input
-        //     this.chatInput.setVisible(this.chatVisible);
-
-        //     if (this.chatVisible) {
-        //         this.chatInput.node.firstChild.focus();
-        //         this.isTyping = true;
-        //     } else {
-        //         this.isTyping = false;
-        //     }
-        // });
-
-        // // Manejar el envío de mensajes con Enter y cerrar chat con Escape
-        // this.chatInput.node.addEventListener('keydown', (event) => {
-        //     if (event.key === 'Enter') {
-        //         const message = this.chatInput.node.value;
-        //         this.socket.emit('chatMessageToServer', { roomCode: this.roomCode, nickname: this.session.nickname, message });
-        //         this.chatInput.node.value = '';
-        //         this.isTyping = false;
-        //     } else if (event.key === 'Escape') {
-        //         this.chatVisible = false;
-        //         this.chatInput.setVisible(this.chatVisible);
-        //         this.chatInput.node.blur();
-        //         this.isTyping = false;
-        //     }
-        // });
-
+    
         // Fondo del chat
         this.chatBox = this.add.rectangle(0, 300, 380, 120, 0x000000, 0.5)
             .setOrigin(0)
@@ -69,7 +22,7 @@ export class Chat extends Phaser.Scene {
             .setDepth(1000);
 
         // Caja de entrada del chat
-        this.chatInput = this.add.dom(0, 420).createFromHTML('<input type="text" placeholder="Pulsa T para chatear" maxlength="100">')
+        this.chatInput = this.add.dom(0, 420).createFromHTML('<input type="text" placeholder="Pulsa Esc para cerrar el chat" maxlength="100">')
             .setScrollFactor(0).setOrigin(0).setDepth(1001);
 
         // Contenedor DOM para mensajes
@@ -154,20 +107,6 @@ export class Chat extends Phaser.Scene {
                     text: message
                 });
 
-                // // Mostrar mensaje sobre la cabeza del jugador (temporal)
-                // if (this.chatBubble) this.chatBubble.destroy();
-                // this.chatBubble = this.add.text(this.player.x, this.player.y - 48, message, {
-                //     fontSize: '12px',
-                //     fill: '#000',
-                //     backgroundColor: '#fff',
-                //     borderRadius: 5,
-                //     border: '1px solid #000',
-                //     padding: { x: 6, y: 2 }
-                // }).setOrigin(0.5);
-
-                // this.time.delayedCall(5000, () => {
-                //     if (this.chatBubble) this.chatBubble.destroy();
-                // });
 
                 input.value = '';
                 input.blur();
@@ -204,21 +143,7 @@ export class Chat extends Phaser.Scene {
         // Recibir mensajes de otros jugadores
         this.socket.on('chatMessageToRoom', ({ id, nickname, text }) => {
             console.log(`${nickname}: ${text}`);
-            // Mostrar mensaje en el chat
-            // const chatMessage = this.add.text(10, 10, `${nickname}: ${text}`, {
-            //   fontSize: '14px',
-            //   fill: '#fff',
-            //   backgroundColor: '#00000099',
-            //   padding: { x: 4, y: 2 }
-            // }).setOrigin(0, 0).setScrollFactor(0);
-            // chatMessage.setDepth(1000); // Asegurarse de que el mensaje esté por encima del fondo del chat
-            // // añadirlo a la array de mensajes
-            // this.chatMessages.push(chatMessage);
-            // // Eliminar mensajes antiguos
-            // if (this.chatMessages.length > 5) {
-            //   const oldMessage = this.chatMessages.shift();
-            //   oldMessage.destroy();
-            // }
+
             const message = `<div><strong>${nickname}</strong>: ${text}</div>`;
 
             // Añadir mensaje al array y limitar a 100

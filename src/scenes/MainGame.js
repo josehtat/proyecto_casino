@@ -24,6 +24,9 @@ export class MainGame extends Phaser.Scene {
     this.socket.removeAllListeners("movementUpdate");
     this.socket.removeAllListeners("playerDisconnected");
 
+    // lanzar la escena de UI
+    this.scene.launch('UI');
+
     // declaración de variable de tiempo, usada para no mandar 60 peticiones por segundo al server!
     this.timeSinceLastUpdate = 0;
 
@@ -59,7 +62,9 @@ export class MainGame extends Phaser.Scene {
 
     //recoger los objetos de la capa de objetos de juegos
     const gameZonesLayer = this.map.getObjectLayer('zonas_juego');
+    const exitZoneLayer = this.map.getObjectLayer('salida');
     this.gameZones = this.physics.add.group();
+    this.exitZone = this.physics.add.group();
 
     gameZonesLayer.objects.forEach((obj) => {
       const zone = this.add.zone(obj.x, obj.y, obj.width, obj.height)
@@ -70,7 +75,13 @@ export class MainGame extends Phaser.Scene {
       this.gameZones.add(zone);
     });
 
-
+    exitZoneLayer.objects.forEach((obj) => {
+      const exitZone = this.add.zone(obj.x, obj.y, obj.width, obj.height)
+        .setOrigin(0)
+        .setName(obj.name || obj.type);
+      this.physics.world.enable(exitZone);
+      this.exitZone.add(exitZone);
+    });
 
     //colisión de los límites
     this.ceiling.setCollisionByExclusion([-1], true);
@@ -196,13 +207,22 @@ export class MainGame extends Phaser.Scene {
     // Solapamiento entre jugador y zona de juego
     this.physics.add.overlap(this.player, this.gameZones, (player, zone) => {
       this.playerNearGame = zone;
+      this.events.emit('showInteract', true); // Mostrar "E para interactuar"
     });
 
     // Reset si no hay solapamiento
     this.physics.world.on('worldstep', () => {
       if (!this.physics.overlap(this.player, this.gameZones)) {
         this.playerNearGame = null;
+        this.events.emit('showInteract', false); // Ocultar "E para interactuar"
       }
+    });
+
+    // colisiones entre el jugador y la zona de salida
+    // Solapamiento entre jugador y zona de salida
+    this.physics.add.overlap(this.player, this.exitZone, (player, zone) => {
+      console.log('saliendo...');
+      this.returnToRooms();
     });
 
     // Tecla E para interactuar
@@ -469,5 +489,15 @@ export class MainGame extends Phaser.Scene {
     });
   }
 
+  returnToRooms() {
+    this.scene.stop('Chat');
+    this.scene.stop('UI');
+    this.socket.removeAllListeners();
+    //reiniciar el socket, esto hace que el server aplique la lógica del evento disconnect
+    //parece una chapuza pero es imposible llamar al evento disconnect desde el cliente a no ser que lo hagas así
+    this.socket.disconnect();
+    this.socket.connect();
+    this.scene.start('Rooms');
+  }
 }
 
