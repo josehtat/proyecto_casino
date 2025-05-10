@@ -26,10 +26,24 @@ export class Blackjack extends Phaser.Scene {
         this.add.rectangle(400, 150, 750, 300, 0x000000, 0.5);
         this.add.text(400, 20, `Mesa de Blackjack: ${this.table}`, { fontSize: '18px', color: '#fff' }).setOrigin(0.5);
 
-        // Cerrar esta escena con Esc y devolver el movimiento
-        this.input.keyboard.on('keydown-ESC', () => {
+        // Cerrar esta escena y devolver el movimiento
+        this.add.text(720, 20, 'Cerrar', { 
+            fontSize: '18px', 
+            color: '#fff', 
+            backgroundColor: '#f00', 
+            padding: { x: 10, y: 5 } 
+        })
+            .setOrigin(0.5)
+            .setInteractive()
+            .on('pointerdown', () => {
             this.closeScene();
-        });
+            })
+            .on('pointerover', function () {
+            this.setStyle({ backgroundColor: '#ff5555' });
+            })
+            .on('pointerout', function () {
+            this.setStyle({ backgroundColor: '#f00' });
+            });
 
 
         // Unir jugador a la mesa (esto se hace en el servidor)
@@ -55,6 +69,14 @@ export class Blackjack extends Phaser.Scene {
             console.log(`Error al unirse a la mesa: ${error}`);
             // Mostrar mensaje de error
             this.add.text(400, 100, `Error: ${error}`, { fontSize: '18px', color: '#f00' }).setOrigin(0.5);
+            // Destruir el botón "Listo" si existe
+            if (this.readyButton) {
+                this.readyButton.destroy();
+            }
+            // salir de la escena a los 3 segundos
+            setTimeout(() => {
+                this.closeScene();
+            }, 3000);
         });
 
 

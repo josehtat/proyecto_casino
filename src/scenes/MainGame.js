@@ -247,6 +247,24 @@ export class MainGame extends Phaser.Scene {
 
           // opcional: this.scene.pause();
         }
+        if (this.playerNearGame.name === 'Poker1') {
+          //decirle a la escena del poker que es la mesa 1
+          if (this.isTyping || this.movementBlocked) {
+            return; // No permitir la interacción si el jugador está escribiendo o el movimiento está bloqueado
+          }
+          this.scene.launch('Poker', { roomCode: this.roomCode, table: this.playerNearGame.name });
+
+          // opcional: this.scene.pause();
+        }
+        if (this.playerNearGame.name === 'Poker2') {
+          //decirle a la escena del poker que es la mesa 2
+          if (this.isTyping || this.movementBlocked) {
+            return; // No permitir la interacción si el jugador está escribiendo o el movimiento está bloqueado
+          }
+          this.scene.launch('Poker', { roomCode: this.roomCode, table: this.playerNearGame.name });
+
+          // opcional: this.scene.pause();
+        }
       }
     });
 
@@ -329,6 +347,11 @@ export class MainGame extends Phaser.Scene {
       this.movementBlocked = block;
     });
 
+    // Escuchar el evento de bloqueo de movimiento de la escena del poker
+    const pokerScene = this.scene.get('Poker');
+    pokerScene.events.on('blockPlayerMovement', (block) => {
+      this.movementBlocked = block;
+    });
   }
 
   update(time, delta) {

@@ -43,7 +43,7 @@ export class Chat extends Phaser.Scene {
         this.chatMessagesContainer.setVisible(true);
 
         // Array para almacenar mensajes
-        this.chatMessages = [];
+        this.chatMessages = [`<div><strong>Sistema</strong>: ¡Puedes compartir esta sala copiando la dirección de la barra del navegador!</div>`];
 
         const input = this.chatInput.node.firstChild;
         this.chatInput.node.parentNode.style.position = 'absolute';
