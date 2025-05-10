@@ -262,6 +262,13 @@ export class MainGame extends Phaser.Scene {
             return; // No permitir la interacción si el jugador está escribiendo o el movimiento está bloqueado
           }
           this.scene.launch('Poker', { roomCode: this.roomCode, table: this.playerNearGame.name });
+        }
+        if (this.playerNearGame.name === 'slot') {
+          //decirle a la escena del blackjack que es la mesa 1
+          if (this.isTyping || this.movementBlocked) {
+            return; // No permitir la interacción si el jugador está escribiendo o el movimiento está bloqueado
+          }
+          this.scene.launch('Slot', { roomCode: this.roomCode, table: this.playerNearGame.name });
 
           // opcional: this.scene.pause();
         }
@@ -352,6 +359,11 @@ export class MainGame extends Phaser.Scene {
     pokerScene.events.on('blockPlayerMovement', (block) => {
       this.movementBlocked = block;
     });
+    const SlotScene = this.scene.get('Slot');
+    SlotScene.events.on('blockPlayerMovement', (block) => {
+      this.movementBlocked = block;
+    });
+
   }
 
   update(time, delta) {

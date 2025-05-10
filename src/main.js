@@ -9,6 +9,7 @@ import { Poker } from './scenes/Poker';
 import { UI } from './scenes/UI';
 
 
+import { Slot } from './scenes/Slot';
 import Phaser from 'phaser';
 
 const config = {
@@ -42,7 +43,8 @@ const config = {
         Chat,
         Blackjack,
         Poker,
-        UI
+        UI,
+        Slot
     ]
 };
 
