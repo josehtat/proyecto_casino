@@ -34,71 +34,96 @@ export class Slot extends Phaser.Scene {
         const lever = this.add.rectangle(550, 300, 20, 120, 0x888888).setOrigin(0.5); // Palanca más grande y ajustada
         const leverKnob = this.add.circle(550, 360, 15, 0xaaaaaa).setOrigin(0.5); // Pomo de la palanca
 
+        lever.setName('lever');
+        leverKnob.setName('leverKnob');
+
         // Hacer la palanca interactiva
         lever.setInteractive();
         leverKnob.setInteractive();
 
         // Acción al tirar de la palanca
         lever.on('pointerdown', () => {
+            console.log('Palanca activada');
             this.pullLever(lever, leverKnob, symbols);
         });
 
         leverKnob.on('pointerdown', () => {
+            console.log('Pomo de la palanca activado');
             this.pullLever(lever, leverKnob, symbols);
         });
 
         this.input.keyboard.on('keydown-ESC', () => {
             this.closeScene();
         });
+
+        this.game.socket.on('scoreUpdated', (data) => {
+            if (data.success) {
+                console.log(`Puntuación actualizada en el servidor: nickname=${data.nickname}, score=${data.score}`);
+            } else {
+                console.error(`Error al actualizar la puntuación: ${data.error}`);
+            }
+        });
     }
 
     pullLever(lever, leverKnob, symbols) {
-        // Animar la palanca hacia abajo y luego hacia arriba
+        console.log('Método pullLever ejecutado');
+
+        // Desactivar interacción con la palanca
+        lever.disableInteractive();
+        leverKnob.disableInteractive();
+
         this.tweens.add({
             targets: [lever, leverKnob],
             y: '+=50',
             duration: 200,
             yoyo: true,
             onComplete: () => {
-                // Girar los rodillos después de la animación
+                console.log('Animación de la palanca completada');
                 this.spinReels(symbols);
             }
         });
     }
 
     spinReels(symbols) {
-        // Animar las columnas para que giren
-        this.columns.forEach((column, index) => {
-            let spinCount = 10 + index * 5; // Número de giros por columna (más giros para las últimas)
-            this.time.addEvent({
-                delay: 50, // Tiempo entre cada cambio de símbolo
-                repeat: spinCount - 1, // Número de repeticiones
-                callback: () => {
-                    const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-                    column.setText(randomSymbol);
-                },
-                onComplete: () => {
-                    // Detener la columna con un símbolo final
-                    const finalSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-                    column.setText(finalSymbol);
+        let completedColumns = 0;
 
-                    // Verificar el resultado después de que todas las columnas se detengan
-                    if (index === this.columns.length - 1) {
-                        this.checkResult();
+        this.columns.forEach((column, index) => {
+            const spinCount = 10 + index * 5;
+            for (let i = 0; i < spinCount; i++) {
+                this.time.delayedCall(50 * i, () => {
+                    const sym = symbols[Math.floor(Math.random() * symbols.length)];
+                    column.setText(sym);
+
+                    if (i === spinCount - 1) {
+                        completedColumns++;
+                        if (completedColumns === this.columns.length) {
+                            this.checkResult();
+
+                            // Reactivar interacción con la palanca después de que las frutas terminen de moverse
+                            const lever = this.children.getByName('lever');
+                            const leverKnob = this.children.getByName('leverKnob');
+                            lever.setInteractive();
+                            leverKnob.setInteractive();
+                        }
                     }
-                }
-            });
+                }, [], this);
+            }
         });
     }
 
     checkResult() {
-        const result = this.columns.map(column => column.text);
+        console.log('Método checkResult ejecutado');
+        const result = this.columns.map(column => {
+            console.log('Texto de columna:', column.text); // Verifica el texto de cada columna
+            return column.text;
+        });
         console.log('Resultado del slot:', result);
 
-        // Comprobar si todos los símbolos son iguales (victoria)
         const isWin = result.every(symbol => symbol === result[0]);
+        console.log('¿Es victoria?', isWin);
 
         if (isWin) {
+            this.disableLeverInteraction();
             this.showWinMessage();
         } else {
             console.log('No has ganado. Intenta de nuevo.');
@@ -106,17 +131,28 @@ export class Slot extends Phaser.Scene {
     }
 
     showWinMessage() {
-        // Mostrar mensaje de victoria
+        console.log('Método showWinMessage ejecutado'); // Verifica si se llama
         const winText = this.add.text(400, 200, '¡Has ganado!', { fontSize: '48px', color: '#00ff00' }).setOrigin(0.5);
 
-        // Cerrar la escena después de 2 segundos
-        this.time.delayedCall(2000, () => {
+        // Emitir evento al servidor para actualizar la puntuación
+        this.game.socket.emit('updateScore', {
+            nickname: this.game.session.nickname, // Nombre del jugador
+            score: 100 // Puntos ganados
+        });
+        console.log(`Evento updateScore emitido: nickname=${this.game.session.nickname}, score=100`);
+
+        this.time.delayedCall(3000, () => {
             this.closeScene();
         });
     }
 
+    disableLeverInteraction() {
+        console.log('Método disableLeverInteraction ejecutado');
+        this.input.enabled = false;
+    }
+
     closeScene() {
-        console.log('Cerrando escena de Slot');
+        console.log('Método closeScene ejecutado');
         this.scene.stop();
         this.events.emit('blockPlayerMovement', false);
     }
