@@ -357,8 +357,53 @@ export class Poker extends Phaser.Scene {
     }
 
     closeScene() {
+         // Limpiar los textos de los jugadores
+         if (this.playerTexts) {
+            this.playerTexts.forEach(text => text.destroy());
+        }
+        this.playerTexts = [];
+
+        // Limpiar las cartas comunitarias
+        if (this.communityCardSprites) {
+            this.communityCardSprites.forEach(card => card.destroy());
+        }
+        this.communityCardSprites = [];
+
+        // Limpiar las cartas de los jugadores
+        if (this.playerCardSprites) {
+            Object.values(this.playerCardSprites).forEach(cards => {
+                cards.forEach(card => card.destroy());
+            });
+        }
+        this.playerCardSprites = {};
+
+        // Limpiar los textos de ronda, apuesta y bote
+        if (this.roundText) this.roundText.destroy();
+        if (this.currentBetText) this.currentBetText.destroy();
+        if (this.potText) this.potText.destroy();
+
+        // Limpiar los botones de acción
+        if (this.actionButtons) {
+            this.actionButtons.forEach(button => button.destroy());
+        }
+        this.actionButtons = [];
+
+        // Limpiar textos de ganadores
+        if (this.resultTexts) {
+            this.resultTexts.forEach(text => text.destroy());
+        }
+        this.resultTexts = [];
+
         this.events.emit('blockPlayerMovement', false);
         this.socket.emit('pokerLeaveTable', this.roomCode, this.table);
+        this.socket.off('pokerTableJoined');
+        this.socket.off('pokerTableError');
+        this.socket.off('pokerPlayerReadyStatus');
+        this.socket.off('pokerGameStart');
+        this.socket.off('pokerGameState');
+        this.socket.off('pokerGameResults');
+        this.socket.off('pokerPlayerJoined');
+        this.socket.off('pokerPlayerLeft');
         this.scene.stop();
     }
 
