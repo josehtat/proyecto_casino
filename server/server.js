@@ -19,8 +19,6 @@ const io = new Server(server, {
   cors: { origin: "*" },
 });
 
-
-
 //configuración de session
 app.use(session({
   secret: process.env.SESSION_SECRET,
@@ -28,7 +26,6 @@ app.use(session({
   saveUninitialized: true,
   cookie: { secure: false }
 }));
-
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname = dirname(__filename);
@@ -148,6 +145,27 @@ app.use(vite.middlewares);
 //   const html = await vite.transformIndexHtml(req.url, await import('fs').promises.readFile(htmlPath, 'utf-8'));
 //   res.status(200).set({ 'Content-Type': 'text/html' }).send(html);
 // });
+
+// Escuchar el evento updateScore para actualizar la puntuación del jugador
+io.on('connection', (socket) => {
+  socket.on('updateScore', async ({ nickname, score }) => {
+    console.log(`Evento updateScore recibido: nickname=${nickname}, score=${score}`);
+    try {
+      // Actualizar la puntuación del jugador en la base de datos
+      await sequelize.query(
+        'UPDATE users SET score = score + :score WHERE nickname = :nickname',
+        {
+          replacements: { score, nickname },
+        }
+      );
+      console.log(`Puntuación actualizada para ${nickname}: +${score}`);
+      socket.emit('scoreUpdated', { success: true, nickname, score });
+    } catch (error) {
+      console.error('Error al actualizar la puntuación:', error);
+      socket.emit('scoreUpdated', { success: false, error: error.message });
+    }
+  });
+});
 
 // Conectar DB y configurar sockets
 await connectDB(); // Asegurar que la base de datos esté conectada antes de usarla
