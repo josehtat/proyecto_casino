@@ -95,7 +95,7 @@ export class MainGame extends Phaser.Scene {
       this.physics.world.enable(zone);
       zone.body.setImmovable(true); // Hacer que el objeto sea inmóvil
       this.physics.add.collider(this.player, zone, () => {
-        console.log('Colisión detectada con zona:', zone.name);
+        // console.log('Colisión detectada con zona:', zone.name);
       });
     });
 
@@ -188,7 +188,7 @@ export class MainGame extends Phaser.Scene {
 
     // establecer colisiones entre el jugador y el suelo
     this.physics.add.collider(this.player, this.ceiling, (player, ceiling) => {
-      console.log('Colisión detectada!');
+      // console.log('Colisión detectada!');
     });
     // const debugGraphics = this.add.graphics().setAlpha(0.75);
     // this.ceiling.renderDebug(debugGraphics);
@@ -221,7 +221,7 @@ export class MainGame extends Phaser.Scene {
     // colisiones entre el jugador y la zona de salida
     // Solapamiento entre jugador y zona de salida
     this.physics.add.overlap(this.player, this.exitZone, (player, zone) => {
-      console.log('saliendo...');
+      // console.log('saliendo...');
       this.returnToRooms();
     });
 
@@ -276,7 +276,7 @@ export class MainGame extends Phaser.Scene {
     });
 
     // --- DEBUG ---
-    this.drawDebugZones(this.gameZones);
+    // this.drawDebugZones(this.gameZones);
 
 
     // --- Multijugador ---

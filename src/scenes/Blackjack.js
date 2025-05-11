@@ -17,7 +17,7 @@ export class Blackjack extends Phaser.Scene {
 
         this.tablePlayers = [];
 
-        console.log('Escena de Blackjack creada');
+        // console.log('Escena de Blackjack creada');
         // decirle a la escena MainGame que bloquee el movimiento del jugador
         this.events.emit('blockPlayerMovement', true);
 
@@ -52,8 +52,8 @@ export class Blackjack extends Phaser.Scene {
         this.socket.on('blackjackTableJoined', (tableName, players, readyStatus) => {
             if (tableName !== this.table) return; // Ignorar si no es la mesa actual
 
-            console.log(`Unido a la mesa ${tableName}`);
-            console.log('Estado inicial de los jugadores:', readyStatus);
+            // console.log(`Unido a la mesa ${tableName}`);
+            // console.log('Estado inicial de los jugadores:', readyStatus);
 
             // Actualizar la lista de jugadores y sus estados
             this.tablePlayers = players.map(player => ({
@@ -66,7 +66,7 @@ export class Blackjack extends Phaser.Scene {
 
         // Escuchar el evento de error al unirse a la mesa
         this.socket.on('blackjackTableError', (error) => {
-            console.log(`Error al unirse a la mesa: ${error}`);
+            // console.log(`Error al unirse a la mesa: ${error}`);
             // Mostrar mensaje de error
             this.add.text(400, 100, `Error: ${error}`, { fontSize: '18px', color: '#f00' }).setOrigin(0.5);
             // Destruir el botón "Listo" si existe
@@ -84,11 +84,11 @@ export class Blackjack extends Phaser.Scene {
         this.socket.on('blackjackPlayerJoined', ({ tableName, player }) => {
             if (tableName !== this.table) return; // Si la mesa no es la misma, no hacer nada
 
-            console.log(`Jugador unido a la mesa ${tableName}: ${player.nickname}`);
+            // console.log(`Jugador unido a la mesa ${tableName}: ${player.nickname}`);
             // Verificar si el jugador ya está en la lista
             const alreadyJoined = this.tablePlayers.find((p) => p.id === player.id);
             if (alreadyJoined) {
-                console.log(`El jugador ${player.nickname} ya está en la mesa ${tableName}`);
+                // console.log(`El jugador ${player.nickname} ya está en la mesa ${tableName}`);
                 return; // Si el jugador ya está en la lista, no hacer nada
             }
 
@@ -97,21 +97,21 @@ export class Blackjack extends Phaser.Scene {
         });
 
         this.socket.on('blackjackPlayerLeft', (data) => {
-            console.log(`Evento blackjackPlayerLeft recibido:`, data);
+            // console.log(`Evento blackjackPlayerLeft recibido:`, data);
 
             const { tableName, playerId } = data;
 
-            console.log(`Jugador salido de la mesa ${tableName}: ${playerId}`);
-            console.log('jugadores antes del filtro:');
-            console.log(this.tablePlayers);
+            // console.log(`Jugador salido de la mesa ${tableName}: ${playerId}`);
+            // console.log('jugadores antes del filtro:');
+            // console.log(this.tablePlayers);
 
             // Filtrar el jugador que salió
-            console.log('mesa: ' + tableName);
-            console.log('mesa actual: ' + this.table);
+            // console.log('mesa: ' + tableName);
+            // console.log('mesa actual: ' + this.table);
             if (tableName !== this.table) return; // Si la mesa no es la misma, no hacer nada
             this.tablePlayers = this.tablePlayers.filter(p => p.id !== playerId); // Eliminar jugador de la lista
-            console.log('jugadores después del filtro ');
-            console.log(this.tablePlayers);
+            // console.log('jugadores después del filtro ');
+            // console.log(this.tablePlayers);
             this.showPlayers(this.tablePlayers); // Actualizar la lista visual
         });
 
@@ -141,7 +141,7 @@ export class Blackjack extends Phaser.Scene {
         this.socket.on('blackjackPlayerReadyStatus', ({ tableName, playerId, isReady }) => {
             if (tableName !== this.table) return; // Ignorar si no es la mesa actual
 
-            console.log(`Jugador ${playerId} está ${isReady ? 'Listo' : 'No Listo'}`);
+            // console.log(`Jugador ${playerId} está ${isReady ? 'Listo' : 'No Listo'}`);
             const player = this.tablePlayers.find(p => p.id === playerId);
             if (player) {
                 player.isReady = isReady;
@@ -153,7 +153,7 @@ export class Blackjack extends Phaser.Scene {
         this.socket.on('blackjackGameStart', ({ tableName }) => {
             if (tableName !== this.table) return; // Ignorar si no es la mesa actual
 
-            console.log(`La partida en la mesa ${tableName} ha comenzado.`);
+            // console.log(`La partida en la mesa ${tableName} ha comenzado.`);
             this.startGame(); // Lógica para iniciar la partida
         });
 
@@ -233,7 +233,7 @@ export class Blackjack extends Phaser.Scene {
     }
 
     startGame() {
-        console.log('La partida ha comenzado.');
+        // console.log('La partida ha comenzado.');
 
         // Mostrar un mensaje indicando que la partida ha comenzado
         this.readyButton.destroy(); // Destruir el botón "Listo"
@@ -286,12 +286,12 @@ export class Blackjack extends Phaser.Scene {
         this.socket.on('blackjackGameState', (gameState) => {
             if (gameState.tableName !== this.table) return; // Ignorar si no es la mesa actual
 
-            console.log('Estado del juego recibido:', gameState);
+            // console.log('Estado del juego recibido:', gameState);
             this.showPlayers(this.tablePlayers, gameState);
 
             // Verificar si el jugador local está en el estado del juego
             if (!gameState.players[this.socket.id]) {
-                console.warn('El estado del jugador local no está definido en gameState.players.');
+                // console.warn('El estado del jugador local no está definido en gameState.players.');
                 return; // Salir del evento si el estado del jugador no está definido
             }
 
@@ -300,7 +300,7 @@ export class Blackjack extends Phaser.Scene {
 
             // Verificar si el jugador local está plantado o se ha pasado de 21
             if (playerValue > 21 || gameState.standStatus[this.socket.id]) {
-                console.log('El jugador local se ha pasado de 21 o está plantado.');
+                // console.log('El jugador local se ha pasado de 21 o está plantado.');
                 this.hitButton.disableInteractive();
                 this.standButton.disableInteractive();
                 this.hitButton.setStyle({ backgroundColor: '#888' }); // Cambiar a gris cuando esté desactivado
@@ -311,7 +311,7 @@ export class Blackjack extends Phaser.Scene {
         // Escuchar los resultados del juego
         this.socket.on('blackjackGameResults', ({tableName, dealer, results }) => {
             if (tableName !== this.table) return; // Ignorar si no es la mesa actual
-            console.log('Resultados del juego:', results);
+            // console.log('Resultados del juego:', results);
 
             // Definir las posiciones de los jugadores
             const positions = [
@@ -347,7 +347,7 @@ export class Blackjack extends Phaser.Scene {
     }
 
     resetGame() {
-        console.log('Reiniciando el juego...');
+        // console.log('Reiniciando el juego...');
 
         // Limpiar los textos y botones
         if (this.playerTexts) {

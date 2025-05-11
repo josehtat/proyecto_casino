@@ -155,7 +155,7 @@ export class Rooms extends Phaser.Scene {
             }).setOrigin(0.5).setInteractive();
 
             roomText.on("pointerdown", () => {
-                console.log(`Unirse a la sala ${room.code} como ${this.session.nickname}`);
+                // console.log(`Unirse a la sala ${room.code} como ${this.session.nickname}`);
                 this.socket.emit("joinRoom", room.code, this.session.nickname);
             });
             roomText.on("pointerover", () => {

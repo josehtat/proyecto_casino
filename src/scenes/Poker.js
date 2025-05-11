@@ -16,7 +16,7 @@ export class Poker extends Phaser.Scene {
 
         this.tablePlayers = [];
 
-        console.log('Escena de Poker creada');
+        // console.log('Escena de Poker creada');
         this.events.emit('blockPlayerMovement', true);
 
         // Crear el fondo de la mesa
@@ -49,7 +49,7 @@ export class Poker extends Phaser.Scene {
         this.socket.on('pokerTableJoined', (tableName, players, readyStatus) => {
             if (tableName !== this.table) return;
 
-            console.log(`Unido a la mesa ${tableName}`);
+            // console.log(`Unido a la mesa ${tableName}`);
             this.tablePlayers = players.map(player => ({
                 ...player,
                 isReady: readyStatus[player.id] || false // Asignar el estado "Listo" o "No Listo"
@@ -59,7 +59,7 @@ export class Poker extends Phaser.Scene {
 
         // Escuchar el evento de error al unirse a la mesa
         this.socket.on('pokerTableError', (error) => {
-            console.log(`Error al unirse a la mesa: ${error}`);
+            // console.log(`Error al unirse a la mesa: ${error}`);
             // Mostrar mensaje de error
             this.add.text(400, 100, `Error: ${error}`, { fontSize: '18px', color: '#f00' }).setOrigin(0.5);
             // Destruir el botón "Listo" si existe
@@ -76,7 +76,7 @@ export class Poker extends Phaser.Scene {
         this.socket.on('pokerPlayerReadyStatus', ({ tableName, playerId, isReady }) => {
             if (tableName !== this.table) return;
 
-            console.log(`Jugador ${playerId} está ${isReady ? 'Listo' : 'No Listo'}`);
+            // console.log(`Jugador ${playerId} está ${isReady ? 'Listo' : 'No Listo'}`);
             const player = this.tablePlayers.find(p => p.id === playerId);
             if (player) {
                 player.isReady = isReady;
@@ -87,14 +87,14 @@ export class Poker extends Phaser.Scene {
         this.socket.on('pokerGameStart', ({ tableName }) => {
             if (tableName !== this.table) return;
 
-            console.log(`La partida en la mesa ${tableName} ha comenzado.`);
+            // console.log(`La partida en la mesa ${tableName} ha comenzado.`);
             this.startGame();
         });
 
         this.socket.on('pokerGameState', (gameState) => {
             if (gameState.tableName !== this.table) return;
 
-            console.log('Estado del juego recibido:', gameState);
+            // console.log('Estado del juego recibido:', gameState);
 
             // Guardar el último estado del juego
             this.latestGameState = gameState;
@@ -141,7 +141,7 @@ export class Poker extends Phaser.Scene {
         this.socket.on('pokerGameResults', ({ tableName, winners, handValues, communityCards }) => {
             if (tableName !== this.table) return;
 
-            console.log(`Ganadores: ${winners.join(', ')}`);
+            // console.log(`Ganadores: ${winners.join(', ')}`);
 
             this.resultTexts = [];
 
@@ -177,7 +177,7 @@ export class Poker extends Phaser.Scene {
         this.socket.on('pokerPlayerJoined', ({ tableName, player }) => {
             if (tableName !== this.table) return;
 
-            console.log(`Jugador unido a la mesa ${tableName}: ${player.nickname}`);
+            // console.log(`Jugador unido a la mesa ${tableName}: ${player.nickname}`);
             const alreadyJoined = this.tablePlayers.find(p => p.id === player.id);
             if (alreadyJoined) return;
 
@@ -189,7 +189,7 @@ export class Poker extends Phaser.Scene {
         this.socket.on('pokerPlayerLeft', ({ tableName, playerId }) => {
             if (tableName !== this.table) return;
 
-            console.log(`Jugador salió de la mesa ${tableName}: ${playerId}`);
+            // console.log(`Jugador salió de la mesa ${tableName}: ${playerId}`);
             this.tablePlayers = this.tablePlayers.filter(p => p.id !== playerId);
             this.showPlayers(this.tablePlayers);
         });
@@ -292,7 +292,7 @@ export class Poker extends Phaser.Scene {
     }
 
     resetGame() {
-        console.log('Reiniciando el juego...');
+        // console.log('Reiniciando el juego...');
 
         // Limpiar los textos de los jugadores
         if (this.playerTexts) {
@@ -363,7 +363,7 @@ export class Poker extends Phaser.Scene {
     }
 
     startGame() {
-        console.log('La partida ha comenzado.');
+        // console.log('La partida ha comenzado.');
 
         this.readyButton.destroy();
 

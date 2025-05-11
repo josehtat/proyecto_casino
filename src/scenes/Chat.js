@@ -142,7 +142,7 @@ export class Chat extends Phaser.Scene {
 
         // Recibir mensajes de otros jugadores
         this.socket.on('chatMessageToRoom', ({ id, nickname, text }) => {
-            console.log(`${nickname}: ${text}`);
+            // console.log(`${nickname}: ${text}`);
 
             const message = `<div><strong>${nickname}</strong>: ${text}</div>`;
 

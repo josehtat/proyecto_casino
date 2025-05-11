@@ -1,5 +1,9 @@
 const socketHandler = (io) => {
-
+    // Comentando todos los console.log en el archivo
+    const originalConsoleLog = console.log;
+    console.log = function (...args) {
+        // originalConsoleLog(...args); // Descomentar esta línea si deseas habilitar los logs temporalmente
+    };
     const rooms = {}; // Almacena las salas activas
 
     io.on("connection", (socket) => {
