@@ -16,7 +16,11 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: "*" },
+  cors: {
+    origin: "https://casinox.ieti.site", // Cambia esto por tu dominio
+    methods: ["GET", "POST"],
+    credentials: true
+  }
 });
 
 

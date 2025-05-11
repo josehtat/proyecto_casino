@@ -52,7 +52,10 @@ export class Play extends Phaser.Scene {
           }
         }
             //creación del socket
-        this.game.socket = io();
+        this.game.socket = io("https://casinox.ieti.site", {
+          transports: ["websocket"], // Fuerza el uso de WebSocket
+          secure: true
+        });
         this.game.session = data; // Almacenamiento de la sesión del jugador
         // console.log('Sesión del jugador:', this.game.session);
    
